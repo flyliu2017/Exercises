@@ -30,13 +30,18 @@ def init_weights(shape):
 
 
 def main(_):
-    ps_hosts=FLAGS.ps_hosts.split(',')
-    worker_hosts=FLAGS.worker_hosts.split(',')
-    cluster=tf.train.ClusterSpec({'ps':ps_hosts,'worker':worker_hosts})
+    hosts = {}
+    ps_hosts = FLAGS.ps_hosts.split(',')
+    worker_hosts = FLAGS.worker_hosts.split(',')
+    if ps_hosts[0] != '':
+        hosts['ps'] = ps_hosts
+    if worker_hosts[0] != '':
+        hosts['worker'] = worker_hosts
+    cluster=tf.train.ClusterSpec(hosts)
     server=tf.train.Server(cluster,job_name=FLAGS.job_name,task_index=FLAGS.task_index)
 
     total_time = 0
-    num_features=len(xdata[0])-1
+    num_features=len(xdata[0])
     is_chief=FLAGS.task_index==0
     batch_size=len(xdata)//len(worker_hosts)
 
@@ -72,7 +77,7 @@ def main(_):
                 spo_op=tf.train.SyncReplicasOptimizer(opt,replicas_to_aggregate=len(worker_hosts),
                                                       total_num_replicas=len(worker_hosts))
                 train_op=spo_op.apply_gradients(grad_var,global_step=global_step)
-                hook.append(spo_op.make_session_run_hook())
+                hook.append(spo_op.make_session_run_hook(is_chief=is_chief))
 
             h = tf.matmul(x,w)
             predict = tf.nn.sigmoid(h)
@@ -85,8 +90,8 @@ def main(_):
                 for j in range(num_iters) :
                     if not sess.should_stop():
                         start = time.time()
-                        sess.run(train_op,feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size + 1],
-                                                     y:ydata[i * batch_size:(i + 1) * batch_size + 1]})
+                        sess.run(train_op,feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
+                                                     y:ydata[i * batch_size:(i + 1) * batch_size ]})
 
                         t=time.time()-start
                         total_time+=t
