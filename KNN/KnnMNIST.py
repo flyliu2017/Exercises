@@ -18,7 +18,6 @@ def main():
 
 
     with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
         topk=sess.run(top_k)
         frequency=np.zeros([test_size,num_feature])
         for i in range(len(topk)):
