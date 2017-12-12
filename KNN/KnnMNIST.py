@@ -1,12 +1,16 @@
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
+import numpy as np
 
 def main():
-    k=5
-    data=input_data.read_data_sets('Single_layer_Perceptron/')
-    xtrain, ytrain = data.test.next_batch(2000)
+    k=10
+    batch_size=500
+    test_size=batch_size//10
+    data=input_data.read_data_sets('KnnMNIST/')
+    xtrain, ytrain = data.test.next_batch(batch_size)
+    xtest, ytest = data.test.next_batch(test_size)
+    num_feature=len(xtest[0])
 
-    xtest, ytest = data.test.next_batch(200)
     sub=tf.subtract(tf.expand_dims(xtrain,0),tf.expand_dims(xtest,1))
     distance=tf.sqrt(tf.reduce_sum(tf.square(sub),-1))
     top_k=tf.nn.top_k(tf.negative(distance),k)[1]
@@ -14,13 +18,13 @@ def main():
 
 
     with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
         topk=sess.run(top_k)
-        frequency=[{j:0 for j in range(10)} for _ in range(200)]
-        for i in topk:
-            for j in i:
+        frequency=np.zeros([test_size,num_feature])
+        for i in range(len(topk)):
+            for j in topk[i]:
                 frequency[i][ytrain[j]]+=1
-
-        predict=[max(i,lambda  key:i[key])[0] for i in frequency]
+        predict=tf.convert_to_tensor(np.argmax(frequency,1),dtype=ytest.dtype)
         TP = tf.equal(ytest, predict)
         accuracy = tf.reduce_mean(tf.cast(TP, tf.float32))
 
