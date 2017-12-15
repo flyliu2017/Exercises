@@ -4,6 +4,7 @@ import time
 import pickle
 from  sklearn.metrics import roc_auc_score
 
+
 FLAGS=tf.app.flags.FLAGS
 tf.app.flags.DEFINE_float('learning_rate',1,'Initial learning rate.')
 tf.app.flags.DEFINE_integer('steps_to_validate',1000,'Steps to validate and print message.')
@@ -83,21 +84,21 @@ def main(_):
             predict = tf.nn.sigmoid(h)
             total_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=h, labels=y))
 
+            step=0
             with tf.train.MonitoredTrainingSession(master=server.target,
                                                    is_chief=is_chief,
                                                    hooks=hook) as sess:
 
-                for global_step in range(num_iters) :
-                    if not sess.should_stop():
+                if step < num_iters and not sess.should_stop():
                         start = time.time()
-                        sess.run(train_op,feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
+                        _,step=sess.run([train_op,global_step],feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
                                                      y:ydata[i * batch_size:(i + 1) * batch_size ]})
 
                         t=time.time()-start
                         total_time+=t
-                        if  global_step%steps_to_validate==0:
+                        if  (step+1)%steps_to_validate==0:
                             predictResult, lossResult= sess.run([predict, total_loss], feed_dict={x: xdata, y: ydata})
-                            print('step ',global_step,' auc:', roc_auc_score(np.array(ydata), predictResult),' loss:', lossResult,' %.4fs/batch' %t)
+                            print('step ',step+1,' auc:', roc_auc_score(np.array(ydata), predictResult),' loss:', lossResult,' %.4fs/batch' %t)
 
                 print('Parameters are:')
                 print(sess.run(w))
