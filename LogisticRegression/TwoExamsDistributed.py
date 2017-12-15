@@ -89,9 +89,10 @@ def main(_):
             with tf.train.MonitoredTrainingSession(master=server.target,
                                                    is_chief=is_chief,
                                                    hooks=hook) as sess:
-                sess.run(init_op)
+                if is_chief:
+                    sess.run(init_op)
                 
-                if step < num_iters and not sess.should_stop():
+                while step < num_iters and not sess.should_stop():
                         start = time.time()
                         _,step=sess.run([train_op,global_step],feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
                                                      y:ydata[i * batch_size:(i + 1) * batch_size ]})
