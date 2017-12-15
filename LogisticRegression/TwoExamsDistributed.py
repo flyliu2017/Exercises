@@ -83,14 +83,12 @@ def main(_):
             h = tf.matmul(x,w)
             predict = tf.nn.sigmoid(h)
             total_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=h, labels=y))
-            init_op=tf.global_variables_initializer()
 
             step=0
             with tf.train.MonitoredTrainingSession(master=server.target,
                                                    is_chief=is_chief,
                                                    hooks=hook) as sess:
-                sess.run(init_op)
-                
+
                 if step < num_iters and not sess.should_stop():
                         start = time.time()
                         _,step=sess.run([train_op,global_step],feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
