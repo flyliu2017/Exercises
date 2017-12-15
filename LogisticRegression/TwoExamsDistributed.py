@@ -87,7 +87,7 @@ def main(_):
                                                    is_chief=is_chief,
                                                    hooks=hook) as sess:
 
-                for j in range(num_iters) :
+                for global_step in range(num_iters) :
                     if not sess.should_stop():
                         start = time.time()
                         sess.run(train_op,feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
@@ -95,9 +95,9 @@ def main(_):
 
                         t=time.time()-start
                         total_time+=t
-                        if  is_chief and (j+1)%steps_to_validate==0:
+                        if  global_step%steps_to_validate==0:
                             predictResult, lossResult= sess.run([predict, total_loss], feed_dict={x: xdata, y: ydata})
-                            print('step ',j+1,' auc:', roc_auc_score(np.array(ydata), predictResult),' loss:', lossResult,' %.4fs/batch' %t)
+                            print('step ',global_step,' auc:', roc_auc_score(np.array(ydata), predictResult),' loss:', lossResult,' %.4fs/batch' %t)
 
                 print('Parameters are:')
                 print(sess.run(w))

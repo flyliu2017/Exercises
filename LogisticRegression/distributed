@@ -1,4 +1,0 @@
-#!/bin/sh
-python3 /root/PycharmProjects/tf/lr/TwoExamsDistributed.py --ps_hosts=127.0.0.1:2000 --worker_hosts=127.0.0.1:2001,127.0.0.1:2002 --job_name=ps --task_index=0 &
-python3 /root/PycharmProjects/tf/lr/TwoExamsDistributed.py --ps_hosts=127.0.0.1:2000 --worker_hosts=127.0.0.1:2001,127.0.0.1:2002 --job_name=worker --task_index=0 &
-python3 /root/PycharmProjects/tf/lr/TwoExamsDistributed.py --ps_hosts=127.0.0.1:2000 --worker_hosts=127.0.0.1:2001,127.0.0.1:2002 --job_name=worker --task_index=1
