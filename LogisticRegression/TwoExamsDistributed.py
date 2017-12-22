@@ -91,17 +91,18 @@ def main(_):
                                                    hooks=hook) as sess:
                 if is_chief:
                     sess.run(init_op)
-                
-                while step < num_iters and not sess.should_stop():
-                        start = time.time()
-                        _,step=sess.run([train_op,global_step],feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
-                                                     y:ydata[i * batch_size:(i + 1) * batch_size ]})
 
+                start = time.time()
+                while step < num_iters and not sess.should_stop():
+                    _,step=sess.run([train_op,global_step],feed_dict={x:xdata[i * batch_size:(i + 1) * batch_size ],
+                                                                      y:ydata[i * batch_size:(i + 1) * batch_size ]})
+
+                    if  (step+1)%steps_to_validate==0:
                         t=time.time()-start
+                        start=time.time()
                         total_time+=t
-                        if  (step+1)%steps_to_validate==0:
-                            predictResult, lossResult= sess.run([predict, total_loss], feed_dict={x: xdata, y: ydata})
-                            print('step ',step+1,' auc:', roc_auc_score(np.array(ydata), predictResult),' loss:', lossResult,' %.4fs/batch' %t)
+                        predictResult, lossResult= sess.run([predict, total_loss], feed_dict={x: xdata, y: ydata})
+                        print('step ',step+1,' auc:', roc_auc_score(np.array(ydata), predictResult),' loss:', lossResult,' %.4fs/batch' %t)
 
                 print('Parameters are:')
                 print(sess.run(w))
