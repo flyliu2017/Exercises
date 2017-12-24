@@ -1,5 +1,5 @@
 import os
-os.chdir(os.getcwd()+'/lr/LogisticRegression/')
+# os.chdir(os.getcwd()+'/lr/LogisticRegression/')
 import sys
 # print(os.getcwd()+'/lr/LogisticRegression')
 # sys.path.append(os.getcwd()+'/lr/LogisticRegression/')
