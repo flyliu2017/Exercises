@@ -26,18 +26,18 @@ y=tf.placeholder(tf.int32,[None,1])
 y2=tf.placeholder(tf.int32,[None,1])
 
 
-params=contrib.tensor_forest.python.tensor_forest.ForestHParams(num_classes=2,num_features=num_features,num_trees=1000,max_nodes=100)
+params=contrib.tensor_forest.python.tensor_forest.ForestHParams(num_classes=2,num_features=num_features,bagging_fraction=0.8,num_trees=100,max_nodes=100,split_after_samples=10)
 
 classifier=contrib.learn.SKCompat(contrib.tensor_forest.client.random_forest.TensorForestEstimator(params))
 
-fit=classifier.fit(xdata[:700],ydata[:700])
-predict=classifier.predict(xdata[700:])
+fit=classifier.fit(xdata,ydata)
+predict=classifier.predict(xdata)
 # accuracy=contrib.metrics.accuracy(tf.convert_to_tensor(predict['classes'],dtype=tf.int32),ydata[700:])
 accuracy=contrib.metrics.accuracy(y,y2)
 
 sess=tf.Session()
 init=tf.global_variables_initializer()
 sess.run(init)
-acc=sess.run(accuracy,feed_dict={y:np.reshape(predict['classes'],[-1,1]),y2:ydata[700:]})
+acc=sess.run(accuracy,feed_dict={y:np.reshape(predict['classes'],[-1,1]),y2:ydata})
 print(acc)
 # ct.tensor_forest.random_forest()
