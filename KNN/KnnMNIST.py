@@ -11,8 +11,12 @@ def main():
     xtest, ytest = data.test.next_batch(test_size)
     num_feature=len(xtest[0])
 
-    sub=tf.subtract(tf.expand_dims(xtrain,0),tf.expand_dims(xtest,1))
-    distance=tf.sqrt(tf.reduce_sum(tf.square(sub),-1))
+    s1=tf.reduce_sum(tf.square(xtrain),1,keep_dims=True)
+    s2=tf.reduce_sum(tf.square(xtest),1,keep_dims=True)
+    m=tf.multiply(xtest,tf.transpose(xtrain))
+    distance=tf.subtract(tf.add(tf.transpose(s1),s2),2*m)
+    # sub=tf.subtract(tf.expand_dims(xtrain,0),tf.expand_dims(xtest,1))
+    # distance=tf.sqrt(tf.reduce_sum(tf.square(sub),-1))
     top_k=tf.nn.top_k(tf.negative(distance),k)[1]
 
 
