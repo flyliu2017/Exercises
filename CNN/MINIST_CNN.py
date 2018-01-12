@@ -79,7 +79,7 @@ def main():
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        for i in range(20000):
+        for i in range(2000):
             batch=mnist.train.next_batch(50)
 
             train_op.run(feed_dict={x:batch[0],y:batch[1],keep_prob:0.5})
