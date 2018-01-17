@@ -90,7 +90,7 @@ def main(_):
 
             with tf.train.MonitoredTrainingSession(master=server.target,
                                                    is_chief=is_chief,
-                                                   checkpoint_dir='./TwoExamsDistributed_ckpt',
+                                                   # checkpoint_dir='./TwoExamsDistributed_ckpt',
                                                    save_checkpoint_secs=10,
                                                    save_summaries_steps=steps_to_validate,
                                                    hooks=hook) as sess:
