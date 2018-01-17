@@ -74,7 +74,7 @@ def main(_):
                 spo_op = tf.train.SyncReplicasOptimizer(opt, replicas_to_aggregate=len(worker_hosts),
                                                         total_num_replicas=len(worker_hosts))
                 train_op = spo_op.apply_gradients(grad_var, global_step=global_step)
-                hook.append(spo_op.make_session_run_hook())
+                hook.append(spo_op.make_session_run_hook(is_chief=is_chief))
 
             h = tf.matmul(x, w)
             predict = tf.nn.sigmoid(h)
