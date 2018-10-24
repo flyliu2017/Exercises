@@ -60,7 +60,7 @@ def cnn(x,fc_node_num):
 
 def main(restore):
     time_str=time.strftime('')
-    fc_node_num=1024
+    fc_node_num=256
     save_path='./MNIST_CNN_'+(str(fc_node_num))+'/'
     mnist=input_data.read_data_sets('data/')
     x=tf.placeholder(tf.float32,[None,784])
@@ -90,19 +90,19 @@ def main(restore):
             saver.restore(sess,save_path)
         else:
             sess.run(tf.global_variables_initializer())
-        for i in range(2000):
+        for i in range(20000):
             batch=mnist.train.next_batch(50)
 
             train_op.run(feed_dict={x:batch[0],y:batch[1],keep_prob:0.5})
 
             if (i+1)%100 ==0:
-                acc=accuracy.eval(feed_dict={
-                    x:x_test,y:y_test,keep_prob:1.0
-                })
+                # acc=accuracy.eval(feed_dict={
+                #     x:x_test,y:y_test,keep_prob:1.0
+                # })
                 val_acc=accuracy.eval(feed_dict={
                     x:x_val,y:y_val,keep_prob:1.0
                 })
-                print('step %d, test accuracy %g, validation accuracy %g' % (i+1, acc,val_acc))
+                print('step %d, test accuracy %g, validation accuracy %g' % (i+1, 0,val_acc))
 
         saver.save(sess,save_path)
 
