@@ -43,10 +43,10 @@ python -m nmt.nmt     --src=vi --tgt=en     ^
         --num_train_steps=100000
 
 python -m nmt.nmt     --src=en --tgt=zh     ^
-        --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data\vocab20000      ^
-        --train_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data\train      ^
-        --dev_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data\dev      ^
-        --test_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data\test     ^
+        --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_edu\vocab20000      ^
+        --train_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_edu\train      ^
+        --dev_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_edu\dev      ^
+        --test_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_edu\test     ^
         --out_dir=E:\nmt_save\nmt_model_en_zh_20000     ^
         --steps_per_stats=100     ^
         --num_layers=2     ^
@@ -55,6 +55,23 @@ python -m nmt.nmt     --src=en --tgt=zh     ^
         --metrics=bleu ^
         --attention="luong" ^
         --override_loaded_hparams=True ^
-        --learning_rate=1 ^
+        --learning_rate=0.05 ^
         --decay_scheme="luong5" ^
-        --num_train_steps=20000
+        --num_train_steps=60000
+
+python -m nmt.nmt     --src=en --tgt=zh     ^
+        --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\vocab_Spoken_20000      ^
+        --train_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_train      ^
+        --dev_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_dev      ^
+        --test_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_test     ^
+        --out_dir=E:\nmt_save\nmt_model_en_zh_Spoken     ^
+        --steps_per_stats=100     ^
+        --num_layers=2     ^
+        --num_units=256     ^
+        --dropout=0.2     ^
+        --metrics=bleu ^
+        --attention="luong" ^
+        --override_loaded_hparams=True ^
+        --learning_rate=0.03 ^
+        --decay_scheme="luong5" ^
+        --num_train_steps=60000
