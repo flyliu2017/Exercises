@@ -6,22 +6,29 @@ from nltk.book import FreqDist
 def en_preprocess(text):
     text=re.sub(r'["”“]',r' &quot; ',text)
     text=re.sub(r'‘([^\n]*)’',r' &quot; \1 &quot; ',text)
+    text=re.sub(r'(?:^|\s)\'([^\n]*)\'(?:$|\s)',r' &quot; \1 &quot; ',text)
     text=re.sub(r'(n\'(?=t))|\'|’',r' &apos;',text)
     text=re.sub(r',',r' , ',text)
-    text=re.sub(r'([.]+)',r' \1 ',text)
-    text=re.sub(r'(?<=\d) ([,.]) (?=\d)',r'\1',text)
+    text=re.sub(r'([.]{2,})',r' \1 ',text)
+    text=re.sub(r'((^|\s)\w+)\.(?=$|\s)',r'\1 .',text)
+    text=re.sub(r' +',r' ',text)
 
     return text
 
 def zh_preprocess(text):
-    text=re.sub('[’‘”“]','"',text)
     text=re.sub('，',',',text)
     text=re.sub('。','.',text)
     text=' '.join(jieba.cut(text))
-    text=re.sub(r'"',r'&quot;',text)
+    text=re.sub(r' +',r' ',text)
+    text=re.sub(r'\n ',r'\n',text)
+    text=re.sub(r'[‘’“”]',r'&quot;',text)
+
     return text
 
-
+def text_process(text,lang,**kwargs):
+    dict = {'zh': zh_preprocess, 'en': en_preprocess}
+    dict.update(kwargs)
+    return dict[lang](text)
 
 def gen_corpus(path, out_dir,name, lang='all'):
     with open(path, 'r', encoding='utf8') as f:
@@ -89,13 +96,15 @@ if __name__ == '__main__':
     out_dir = 'E:\corpus'
     slide_ratios=[0.8, 0.1]
     vocab_size_list=[20000]
-    main(path,name,out_dir,slide_ratios,vocab_size_list)
+    d = {'zh': zh_preprocess, 'en': en_preprocess}
+
+    # main(path,name,out_dir,slide_ratios,vocab_size_list)
     # gen_corpus(path,out_dir,name,'zh')
-    # with open(out_dir+'\{0}.zh'.format(name), 'r', encoding='utf8') as f:
-    #     text_zh=f.read()
-    # with open(out_dir+'\{0}.en'.format(name), 'r', encoding='utf8') as f:
-    #     text_en=f.read()
-    # vocab(text_en,out_dir,name,'en',[25000])
-    # vocab(text_zh,out_dir,name,'zh',[25000])
+    with open(out_dir+'\{0}.zh'.format(name), 'r', encoding='utf8') as f:
+        text_zh=f.read()
+    with open(out_dir+'\{0}.en'.format(name), 'r', encoding='utf8') as f:
+        text_en=f.read()
+    vocab(text_en,out_dir,name,'en',[25000,30000])
+    vocab(text_zh,out_dir,name,'zh',[25000,30000])
     # names=[name+'_'+n for n in ['train.zh','dev.zh','test.zh']]
     # slide_corpus(text_list_zh, slide_ratios, out_dir, names)

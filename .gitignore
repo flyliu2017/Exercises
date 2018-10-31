@@ -1,2 +1,5 @@
 cv_result.csv
 data*
+**/__pycache__
+.ipynb
+**/command

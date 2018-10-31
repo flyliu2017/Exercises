@@ -60,18 +60,28 @@ python -m nmt.nmt     --src=en --tgt=zh     ^
         --num_train_steps=60000
 
 python -m nmt.nmt     --src=en --tgt=zh     ^
-        --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\vocab_Spoken_20000      ^
+        --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\vocab_Spoken_30000      ^
         --train_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_train      ^
         --dev_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_dev      ^
         --test_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_test     ^
-        --out_dir=E:\nmt_save\nmt_model_en_zh_Spoken     ^
-        --steps_per_stats=100     ^
+        --out_dir=E:\nmt_save\nmt_model_en_zh_Spoken_30000     ^
+        --steps_per_stats=200     ^
         --num_layers=2     ^
         --num_units=256     ^
         --dropout=0.2     ^
         --metrics=bleu ^
-        --attention="luong" ^
+        --attention="normed_bahdanau" ^
+        --attention_architecture="gnmt" ^
+        --encoder_type="gnmt" ^
+        --subword_option=bpe ^
         --override_loaded_hparams=True ^
-        --learning_rate=0.03 ^
+        --learning_rate=0.05 ^
         --decay_scheme="luong5" ^
-        --num_train_steps=60000
+        --steps_per_external_eval=200 ^
+        --batch_size=96 ^
+        --num_train_steps=30000
+
+
+python -m nmt.nmt --src=en --tgt=zh --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\vocab_Spoken_30000 --train_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_train --dev_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_dev --test_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_Spoken\Spoken_test --out_dir=E:\nmt_save\nmt_model_en_zh_Spoken_30000 --steps_per_stats=200 --num_layers=2 --num_units=256 --dropout=0.2 --metrics=bleu --attention="normed_bahdanau" --attention_architecture="gnmt" --encoder_type="gnmt" --subword_option=bpe --override_loaded_hparams=True --learning_rate=0.004 --decay_scheme="luong5" --steps_per_external_eval=10000 --batch_size=64 --num_train_steps=120000
+
+python -m nmt.nmt --src=en --tgt=zh --vocab_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_datum1~2\vocab_datum1~2_30000 --train_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_datum1~2\datum1~2_train --dev_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_datum1~2\datum1~2_dev --test_prefix=E:\pyProject\TensorflowExercises\NLP\nmt\nmt\data_datum1~2\datum1~2_test --out_dir=E:\nmt_save\nmt_model_en_zh_datum1~2_30000 --steps_per_stats=200 --num_layers=2 --num_units=256 --dropout=0.2 --metrics=bleu --attention="normed_bahdanau" --attention_architecture="gnmt" --encoder_type="gnmt" --subword_option=bpe --override_loaded_hparams=True --learning_rate=0.5 --decay_scheme="luong5" --steps_per_external_eval=10000 --batch_size=64 --num_train_steps=50000
