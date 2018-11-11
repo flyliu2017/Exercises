@@ -6,8 +6,8 @@ from nltk.book import FreqDist
 def en_preprocess(text):
     text=re.sub(r'([;,()[\]?:]|[.]{2,}|\*+)',r' \1 ',text)
     text=re.sub(r'["”“]',r' &quot; ',text)
-    text=re.sub(r'(?:^|\s)‘([^\n]*?)’(?:$|\s|\.)',r' &quot; \1 &quot; ',text)
-    text=re.sub(r'(?:^|\s)\'([^\n]*?)\'(?:$|\s|\.)',r' &quot; \1 &quot; ',text)
+    text=re.sub(r'(^|\s)‘([^\n]*?)’(?=$|\s|\.)',r'\1 &quot; \2 &quot; ',text)
+    text=re.sub(r'(^|\s)\'([^\n]*?)\'(?=$|\s|\.)',r'\1 &quot; \2 &quot; ',text)
     text=re.sub(r'(n\'(?=t))|(?<=\w)\'(?=([sdm]|ve|ll|re)?\s)|’',r' &apos;',text)
     text=re.sub(r'((^|\s)[^\s.]+)\.(?=$|\s)',r'\1 .',text)
     text=re.sub(r'(?<=\d) , (?=\d)',r',',text)
@@ -93,6 +93,23 @@ def main(path,name,out_dir,slide_ratios,vocab_size_list):
 
 if __name__ == '__main__':
 
+<<<<<<< HEAD
+    name = "Subtitles"
+    path = r'E:\corpus\UM-Corpus\data\Bilingual\{0}\Bi-{0}.txt'.format(name)
+    out_dir = 'E:\corpus'
+    slide_ratios=[0.8, 0.1]
+    vocab_size_list=[20000,25000,30000]
+    d = {'zh': zh_preprocess, 'en': en_preprocess}
+
+    main(path,name,out_dir,slide_ratios,vocab_size_list)
+    # gen_corpus(path,out_dir,name,'zh')
+    # with open(out_dir+'\{0}.zh'.format(name), 'r', encoding='utf8') as f:
+    #     text_zh=f.read()
+    # with open(out_dir+'\{0}.en'.format(name), 'r', encoding='utf8') as f:
+    #     text_en=f.read()
+    # vocab(text_en,out_dir,name,'en',[25000,30000])
+    # vocab(text_zh,out_dir,name,'zh',[25000,30000])
+=======
     name = "Spoken"
     path = r'E:\corpus\UM-Corpus\data\Bilingual\{0}\Bi-{0}.txt'.format(name)
     out_dir = 'E:\corpus'
@@ -108,5 +125,6 @@ if __name__ == '__main__':
         text_en=f.read()
     vocab(text_en,out_dir,name,'en',[25000,30000])
     vocab(text_zh,out_dir,name,'zh',[25000,30000])
+>>>>>>> c25104d53353177d6b4f5fffa4e4b60d85fee858
     # names=[name+'_'+n for n in ['train.zh','dev.zh','test.zh']]
     # slide_corpus(text_list_zh, slide_ratios, out_dir, names)
