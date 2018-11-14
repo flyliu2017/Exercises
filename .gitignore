@@ -3,3 +3,4 @@ cv_result.csv
 **/command
 data*
 __pycache__
+**/*.bin
