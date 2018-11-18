@@ -1,6 +1,5 @@
 import numpy as np
 import re
-from nltk.book import FreqDist
 
 from TensorflowExercises.NLP.nmt.nmt.corpus_process import text_process,slide_corpus,vocab
 
@@ -45,8 +44,8 @@ def main(paths_list,name,out_dir,slide_ratios,vocab_size_list,lang):
     vocab(text_list[1], out_dir,name, 'zh', vocab_size_list)
 
 if __name__ == '__main__':
-    num=[1,2]
-    name = "datum1~2"
+    num=[i+1 for i in range(10)]
+    name = "datum1~10"
     file_dir='E:\corpus\datum2017'
     paths_list=[[],[]]
     for i in num:

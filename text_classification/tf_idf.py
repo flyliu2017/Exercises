@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
 import pickle, operator,os
 from functools import reduce
@@ -80,8 +80,16 @@ class tf_idf(object):
         print("score:%s" % score)
         y = lr.predict(self.test_tfidf)
         print(classification_report(self.test_label, y))
+        
+    def gb_classify(self, **kwargs):
+        gb = GradientBoostingClassifier(**kwargs)
+        gb.fit(self.train_tfidf, self.train_label)
+        score = gb.score(self.val_tfidf, self.val_label)
+        print("score:%s" % score)
+        y = gb.predict(self.test_tfidf)
+        print(classification_report(self.test_label, y))
 
-    def rf_param_grid(self, params, param_grid):
+    def param_grid(self,estimator, params, param_grid):
         total = reduce(operator.mul, [len(v) for v in param_grid.values()])
 
         for n in range(total):
@@ -90,7 +98,7 @@ class tf_idf(object):
             p.update(extra_params)
             print(extra_params)
             print('=' * 20)
-            self.rf_classify(**p)
+            estimator(**p)
 
     def feature_selection(self, path,feature_importance, length_list):
         if not os.path.exists(path):
@@ -125,17 +133,18 @@ def get_params(param_dict, n):
 
 def main(dir, path, load=False, **kwargs):
     m = tf_idf(dir, path, load, **kwargs)
-    m.lr_classify()
-    params = dict(n_estimators=100,
-                  max_features=None,
-                  max_depth=None,
-                  min_impurity_decrease=0e-6,
-                  oob_score=True,
-                  random_state=1024,
-                  n_jobs=-1)
-    # param_grid = {'max_features': [7000],'max_depth':[10,50,100]}
-    param_grid = {'max_features': [200]}
-    m.rf_param_grid(params,param_grid)
+    # m.lr_classify()
+    # params = dict(n_estimators=100,
+    #               max_features=None,
+    #               max_depth=None,
+    #               min_impurity_decrease=0e-6,
+    #               oob_score=True,
+    #               random_state=1024,
+    #               n_jobs=-1)
+    params={}
+    param_grid = {'max_features': [100,200],'max_depth':[30,40]}
+    # param_grid = {'max_features': [200]}
+    m.param_grid(m.gb_classify,params,param_grid)
     # fi = m.rf_classify(**params)
     # m.feature_selection(dir+'full\\',fi, [10000, 20000, 30000])
 
