@@ -2,6 +2,7 @@ import jieba
 import numpy as np
 import re
 from nltk.book import FreqDist
+import gc
 
 def en_preprocess(text):
     text=re.sub(r'([;,()[\]?:]|[.]{2,}|\*+)',r' \1 ',text)
@@ -16,10 +17,11 @@ def en_preprocess(text):
 
     return text
 
-def zh_preprocess(text):
+def zh_preprocess(text,segment=True):
     text=re.sub('，',',',text)
     text=re.sub('。','.',text)
-    text=' '.join(jieba.cut(text))
+    if segment:
+        text=' '.join(jieba.cut(text))
     text=re.sub(r' +',r' ',text)
     text=re.sub(r'\n +',r'\n',text)
     text=re.sub(r'[‘’“”]',r'&quot;',text)
@@ -57,10 +59,10 @@ def slide_corpus(text_list, shuffle_index,slide_ratios, out_dir, names):
         exit(1)
     l=len(text_list)
     slide_num=[0]+[int(l*sum[i]) for i in range(len(sum))]+[l]
-    shuffled_list=np.array(text_list)[shuffle_index]
+    shuffle_list=[text_list[i] for i in shuffle_index]
     for i in range(len(slide_num)-1):
         with open(out_dir+'\\'+names[i], 'w', encoding='utf8') as f:
-            f.writelines(shuffled_list[slide_num[i]:slide_num[i+1]])
+            f.writelines(shuffle_list[slide_num[i]:slide_num[i+1]])
 
 def vocab(text, out_dir,name, lang,vocab_size_list):
     if not out_dir:
@@ -83,6 +85,8 @@ def main(path,name,out_dir,slide_ratios,vocab_size_list):
     en_text,zh_text=gen_corpus_for_mixed_text(path, out_dir, name)
     text_list_en=en_text.splitlines(keepends=True)
     text_list_zh=zh_text.splitlines(keepends=True)
+
+    # 文件较大时，使用numpy.random.shuffle容易内存溢出，使用索引重建python列表可避免
     shuffle_index=np.random.permutation(list(range(len(text_list_en))))
     names = [name + '_' + n for n in ['train.zh', 'dev.zh', 'test.zh']]
     slide_corpus(text_list_zh,shuffle_index, slide_ratios, out_dir, names)

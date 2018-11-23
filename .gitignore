@@ -1,6 +1,6 @@
 cv_result.csv
 **/*.ipynb
 **/command
-data*
+*data*
 __pycache__
 **/*.bin

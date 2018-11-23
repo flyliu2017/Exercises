@@ -3,14 +3,6 @@ import re
 
 from TensorflowExercises.NLP.nmt.nmt.corpus_process import text_process,slide_corpus,vocab
 
-def zh_preprocess(text):
-    text=re.sub('，',',',text)
-    text=re.sub('。','.',text)
-    text=re.sub(r' +',r' ',text)
-    text=re.sub(r'\n +',r'\n',text)
-    text=re.sub(r'[‘’“”]',r'&quot;',text)
-
-    return text
 
 def gen_corpus(paths_list, out_dir,name,lang,**kwargs):
     if len(paths_list)!=len(lang):
@@ -32,20 +24,23 @@ def gen_corpus(paths_list, out_dir,name,lang,**kwargs):
 
 
 def main(paths_list,name,out_dir,slide_ratios,vocab_size_list,lang):
-    text_list=gen_corpus(paths_list,out_dir,name,lang,zh=zh_preprocess)
+    text_list=gen_corpus(paths_list,out_dir,name,lang)
     text_list_en=text_list[0].splitlines(keepends=True)
     text_list_zh=text_list[1].splitlines(keepends=True)
+
+    #文件较大时，使用numpy.random.shuffle容易内存溢出，使用索引重建python列表可避免
     shuffle_index=np.random.permutation(list(range(len(text_list_en))))
     names = [name + '_' + n for n in ['train.zh', 'dev.zh', 'test.zh']]
     slide_corpus(text_list_zh, shuffle_index, slide_ratios, out_dir, names)
+    del text_list_zh
     names = [name + '_' + n for n in ['train.en', 'dev.en', 'test.en']]
     slide_corpus(text_list_en, shuffle_index, slide_ratios, out_dir, names)
     vocab(text_list[0], out_dir,name, 'en', vocab_size_list)
     vocab(text_list[1], out_dir,name, 'zh', vocab_size_list)
 
 if __name__ == '__main__':
-    num=[i+1 for i in range(10)]
-    name = "datum1~10"
+    num=[i+1 for i in range(20)]
+    name = "datum1~20"
     file_dir='E:\corpus\datum2017'
     paths_list=[[],[]]
     for i in num:
