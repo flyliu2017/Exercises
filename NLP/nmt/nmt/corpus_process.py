@@ -1,8 +1,7 @@
 import jieba
 import numpy as np
 import re
-from nltk.book import FreqDist
-import gc
+from collections import Counter
 
 def en_preprocess(text):
     text=re.sub(r'([;,()[\]?:]|[.]{2,}|\*+)',r' \1 ',text)
@@ -71,13 +70,13 @@ def vocab(text, out_dir,name, lang,vocab_size_list):
 
     text = text.replace('\n', ' ')
     b = text.split(' ')
-    fd = FreqDist(b)
+    counter = Counter(b)
     u = ['<unk>', '<s>', '</s>','&quot;','.',',']
-    fd.pop('',None)
+    counter.pop('',None)
     for k in u:
-        fd.pop(k,None)
+        counter.pop(k,None)
     for n in vocab_size_list:
-        words = fd.most_common(n)
+        words = counter.most_common(n)
         with open(out_dir+r'\vocab_{0}_{1}.{2}'.format(name,n,lang), 'w', encoding='utf8') as f:
             f.writelines('\n'.join(u + [w[0] for w in words]))
 
@@ -105,12 +104,3 @@ if __name__ == '__main__':
     d = {'zh': zh_preprocess, 'en': en_preprocess}
 
     main(path,name,out_dir,slide_ratios,vocab_size_list)
-    # gen_corpus(path,out_dir,name,'zh')
-    # with open(out_dir+'\{0}.zh'.format(name), 'r', encoding='utf8') as f:
-    #     text_zh=f.read()
-    # with open(out_dir+'\{0}.en'.format(name), 'r', encoding='utf8') as f:
-    #     text_en=f.read()
-    # vocab(text_en,out_dir,name,'en',[25000,30000])
-    # vocab(text_zh,out_dir,name,'zh',[25000,30000])
-    # names=[name+'_'+n for n in ['train.zh','dev.zh','test.zh']]
-    # slide_corpus(text_list_zh, slide_ratios, out_dir, names)
