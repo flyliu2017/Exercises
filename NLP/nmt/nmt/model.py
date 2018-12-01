@@ -439,7 +439,7 @@ class BaseModel(object):
       utils.print_out("  decoding maximum_iterations %d" % maximum_iterations)
     else:
       # TODO(thangluong): add decoding_length_factor flag
-      decoding_length_factor = 2.0
+      decoding_length_factor = 1.5
       max_encoder_length = tf.reduce_max(source_sequence_length)
       maximum_iterations = tf.to_int32(tf.round(
           tf.to_float(max_encoder_length) * decoding_length_factor))
@@ -499,11 +499,13 @@ class BaseModel(object):
             decoder_initial_state,)
 
         # Dynamic decoding
+        parallel_iterations=hparams.infer_batch_size if self.mode == tf.contrib.learn.ModeKeys.EVAL else 32
         outputs, final_context_state, _ = tf.contrib.seq2seq.dynamic_decode(
             my_decoder,
             output_time_major=self.time_major,
             swap_memory=True,
-            scope=decoder_scope)
+            scope=decoder_scope,
+            parallel_iterations=parallel_iterations)
 
         sample_id = outputs.sample_id
 
@@ -580,7 +582,8 @@ class BaseModel(object):
             maximum_iterations=maximum_iterations,
             output_time_major=self.time_major,
             swap_memory=True,
-            scope=decoder_scope)
+            scope=decoder_scope,
+            parallel_iterations=hparams.infer_batch_size)
 
         if infer_mode == "beam_search":
           sample_id = outputs.predicted_ids
@@ -673,7 +676,8 @@ class BaseModel(object):
                                     infer_summary=self.infer_summary,
                                     sample_id=self.sample_id,
                                     sample_words=self.sample_words)
-    return sess.run(output_tuple)
+    option=tf.RunOptions(report_tensor_allocations_upon_oom=True)
+    return sess.run(output_tuple,options=option)
 
   def decode(self, sess):
     """Decode a batch.

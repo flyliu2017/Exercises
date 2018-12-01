@@ -16,7 +16,7 @@
 from __future__ import print_function
 
 import math
-import os
+import os,gc
 import random
 import time
 
@@ -148,6 +148,7 @@ def run_external_eval(infer_model,
     Triple containing development scores, testing scores and the TensorFlow
     Variable for the global step number, in this order.
   """
+
   if dev_infer_iterator_feed_dict is None:
     dev_infer_iterator_feed_dict = {}
   if test_infer_iterator_feed_dict is None:
@@ -454,7 +455,7 @@ def train(hparams, scope=None, target_session=""):
   num_train_steps = hparams.num_train_steps
   steps_per_stats = hparams.steps_per_stats
   steps_per_external_eval = hparams.steps_per_external_eval
-  steps_per_eval = 20 * steps_per_stats
+  steps_per_eval = 10 * steps_per_stats
   avg_ckpts = hparams.avg_ckpts
 
   if not steps_per_external_eval:
@@ -500,12 +501,16 @@ def train(hparams, scope=None, target_session=""):
   summary_writer = tf.summary.FileWriter(
       os.path.join(out_dir, summary_name), train_model.graph)
 
+  run_internal_eval(
+      eval_model, eval_sess, model_dir, hparams, summary_writer)
   # First evaluation
-  run_full_eval(
-      model_dir, infer_model, infer_sess,
-      eval_model, eval_sess, hparams,
-      summary_writer, sample_src_data,
-      sample_tgt_data, avg_ckpts)
+  # run_full_eval(
+  #     model_dir, infer_model, infer_sess,
+  #     eval_model, eval_sess, hparams,
+  #     summary_writer, sample_src_data,
+  #     sample_tgt_data, avg_ckpts)
+  # run_external_eval(infer_model, infer_sess, model_dir, hparams,
+  #                   summary_writer)
 
   last_stats_step = global_step
   last_eval_step = global_step
@@ -528,8 +533,8 @@ def train(hparams, scope=None, target_session=""):
           global_step)
       run_sample_decode(infer_model, infer_sess, model_dir, hparams,
                         summary_writer, sample_src_data, sample_tgt_data)
-      run_external_eval(infer_model, infer_sess, model_dir, hparams,
-                        summary_writer)
+      # run_external_eval(infer_model, infer_sess, model_dir, hparams,
+      #                   summary_writer)
 
       if avg_ckpts:
         run_avg_external_eval(infer_model, infer_sess, model_dir, hparams,
@@ -573,8 +578,8 @@ def train(hparams, scope=None, target_session=""):
       run_sample_decode(infer_model, infer_sess,
                         model_dir, hparams, summary_writer, sample_src_data,
                         sample_tgt_data)
-      run_internal_eval(
-          eval_model, eval_sess, model_dir, hparams, summary_writer)
+      # run_internal_eval(
+      #     eval_model, eval_sess, model_dir, hparams, summary_writer)
 
     if global_step - last_external_eval_step >= steps_per_external_eval:
       last_external_eval_step = global_step
@@ -587,9 +592,9 @@ def train(hparams, scope=None, target_session=""):
       run_sample_decode(infer_model, infer_sess,
                         model_dir, hparams, summary_writer, sample_src_data,
                         sample_tgt_data)
-      run_external_eval(
-          infer_model, infer_sess, model_dir,
-          hparams, summary_writer)
+      # run_external_eval(
+      #     infer_model, infer_sess, model_dir,
+      #     hparams, summary_writer)
 
       if avg_ckpts:
         run_avg_external_eval(infer_model, infer_sess, model_dir, hparams,
@@ -610,28 +615,28 @@ def train(hparams, scope=None, target_session=""):
 
   summary_writer.close()
 
-  utils.print_out("# Start evaluating saved best models.")
-  for metric in hparams.metrics:
-    best_model_dir = getattr(hparams, "best_" + metric + "_dir")
-    summary_writer = tf.summary.FileWriter(
-        os.path.join(best_model_dir, summary_name), infer_model.graph)
-    result_summary, best_global_step, _ = run_full_eval(
-        best_model_dir, infer_model, infer_sess, eval_model, eval_sess, hparams,
-        summary_writer, sample_src_data, sample_tgt_data)
-    print_step_info("# Best %s, " % metric, best_global_step, info,
-                    result_summary, log_f)
-    summary_writer.close()
-
-    if avg_ckpts:
-      best_model_dir = getattr(hparams, "avg_best_" + metric + "_dir")
-      summary_writer = tf.summary.FileWriter(
-          os.path.join(best_model_dir, summary_name), infer_model.graph)
-      result_summary, best_global_step, _ = run_full_eval(
-          best_model_dir, infer_model, infer_sess, eval_model, eval_sess,
-          hparams, summary_writer, sample_src_data, sample_tgt_data)
-      print_step_info("# Averaged Best %s, " % metric, best_global_step, info,
-                      result_summary, log_f)
-      summary_writer.close()
+  # utils.print_out("# Start evaluating saved best models.")
+  # for metric in hparams.metrics:
+  #   best_model_dir = getattr(hparams, "best_" + metric + "_dir")
+  #   summary_writer = tf.summary.FileWriter(
+  #       os.path.join(best_model_dir, summary_name), infer_model.graph)
+  #   result_summary, best_global_step, _ = run_full_eval(
+  #       best_model_dir, infer_model, infer_sess, eval_model, eval_sess, hparams,
+  #       summary_writer, sample_src_data, sample_tgt_data)
+  #   print_step_info("# Best %s, " % metric, best_global_step, info,
+  #                   result_summary, log_f)
+  #   summary_writer.close()
+  #
+  #   if avg_ckpts:
+  #     best_model_dir = getattr(hparams, "avg_best_" + metric + "_dir")
+  #     summary_writer = tf.summary.FileWriter(
+  #         os.path.join(best_model_dir, summary_name), infer_model.graph)
+  #     result_summary, best_global_step, _ = run_full_eval(
+  #         best_model_dir, infer_model, infer_sess, eval_model, eval_sess,
+  #         hparams, summary_writer, sample_src_data, sample_tgt_data)
+  #     print_step_info("# Averaged Best %s, " % metric, best_global_step, info,
+  #                     result_summary, log_f)
+  #     summary_writer.close()
 
   return final_eval_metrics, global_step
 

@@ -13,17 +13,20 @@ from xgboost.sklearn import XGBClassifier
 from mlxtend.classifier import StackingCVClassifier
 
 class tf_idf(object):
-    def __init__(self, dir, path, load=False, **kwargs):
-        self.dir = dir
+    def __init__(self, out_dir, path, load=False, **kwargs):
+        self.out_dir = out_dir
+
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(path)
 
         if not load:
 
             file_names = ['train_token.txt', 'val_token.txt', 'test_token.txt']
-            train_label, train_set = self.divide_text(self.dir + file_names[0],shuffle=True)
-            val_label, val_set = self.divide_text(self.dir + file_names[1],shuffle=True)
-            test_label, test_set = self.divide_text(self.dir + file_names[2],shuffle=True)
+            train_label, train_set = self.divide_text(self.out_dir + file_names[0], shuffle=True)
+            val_label, val_set = self.divide_text(self.out_dir + file_names[1], shuffle=True)
+            test_label, test_set = self.divide_text(self.out_dir + file_names[2], shuffle=True)
             corpus_set = train_set + val_set + test_set
-            self.tfidf, self.feature_names = self.cal_tfidf(corpus_set, **kwargs)
+            self.tfidf, self.feature_names = self.cal_tfidf(corpus_set,token_pattern=r"(?u)\b\w+\b", **kwargs)
 
             encoder = preprocessing.LabelEncoder()
             self.train_label = encoder.fit_transform(train_label)
@@ -74,7 +77,8 @@ class tf_idf(object):
         print(accuracy_score(self.test_label,y))
         cost=time.time()-start
         print('time cost:%.2f min'% (cost/60))
-        if hasattr(clf,'feature_importances_'): return clf.feature_importances_
+        if hasattr(clf,'feature_importances_'):
+            return clf.feature_importances_
         return None
 
     def param_grid(self,classifier, params, param_grid):
@@ -197,12 +201,13 @@ def main(dir, path, load=False, **kwargs):
     # m.stacking(LogisticRegression)
     # m.stacking_param_grid(LogisticRegression)
 
-    # fi = m.classify(RandomForestClassifier,**params)
-    # m.feature_selection(dir+'shuffled\\',fi, [10000, 20000, 30000])
+    fi = m.classify(RandomForestClassifier,**params)
+    m.feature_selection(dir+'shuffled\\',fi, [10000, 20000, 30000])
 
 
 if __name__ == '__main__':
-    dir = 'E:\corpus\cnews\\'
+    out_dir = 'E:\corpus\cnews\\'
     # path = r'E:\corpus\cnews\tfidf_save.pickle'
-    path=dir + 'selected_tfidf_10000.pickle'
-    main(dir, path, load=True)
+    path= out_dir + r'len_one\tfidf_save.pickle'
+    # path= out_dir + r'len_one\selected_tfidf_10000.pickle'
+    main(out_dir, path, load=False)

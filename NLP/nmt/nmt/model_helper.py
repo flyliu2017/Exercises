@@ -161,7 +161,7 @@ def create_eval_model(model_creator, hparams, scope=None, extra_args=None):
         tgt_dataset,
         src_vocab_table,
         tgt_vocab_table,
-        hparams.batch_size,
+        hparams.infer_batch_size,
         sos=hparams.sos,
         eos=hparams.eos,
         random_seed=hparams.random_seed,
