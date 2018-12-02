@@ -37,11 +37,11 @@ def main(paths_list, name, out_dir, slide_ratios, vocab_size_list, lang):
 
 
 if __name__ == '__main__':
-    num = [i + 11 for i in range(10)]
-    name = "datum10~20"
+    start_stop = [11,20]
+    name = "datum{0}~{1}".format(start_stop[0],start_stop[1])
     file_dir = 'E:\corpus\datum2017'
     paths_list = [[], []]
-    for i in num:
+    for i in range(start_stop[0],start_stop[1]+1):
         paths_list[0].append(file_dir + r'\Book{0}_en.txt'.format(i))
         paths_list[1].append(file_dir + r'\Book{0}_cn.txt'.format(i))
 
