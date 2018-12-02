@@ -37,8 +37,8 @@ def main(paths_list, name, out_dir, slide_ratios, vocab_size_list, lang):
 
 
 if __name__ == '__main__':
-    num = [i + 1 for i in range(20)]
-    name = "datum1~20"
+    num = [i + 11 for i in range(10)]
+    name = "datum10~20"
     file_dir = 'E:\corpus\datum2017'
     paths_list = [[], []]
     for i in num:

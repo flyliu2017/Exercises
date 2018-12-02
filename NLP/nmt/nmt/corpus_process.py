@@ -6,9 +6,12 @@ from collections import Counter
 def en_preprocess(text):
     text=re.sub(r'([;,()[\]?:]|[.]{2,}|\*+)',r' \1 ',text)
     text=re.sub(r'["”“]',r' &quot; ',text)
-    text=re.sub(r'(^|\s)‘([^\n]*?)’(?=$|\s|\.)',r'\1 &quot; \2 &quot; ',text)
-    text=re.sub(r'(^|\s)\'([^\n]*?)\'(?=$|\s|\.)',r'\1 &quot; \2 &quot; ',text)
+    text=re.sub(r'[`]','\'',text)
+    text=re.sub(r'(^|\s)‘([^\n]*?)’(?=$|\s|\.)',r'\1 &quot2; \2 &quot2; ',text)
+    text=re.sub(r'(^|\s)\'([^\n]*?)\'(?=$|\s|\.)',r'\1 &quot2; \2 &quot2; ',text)
+    text=re.sub(r'can\'t’',r'can &apos;t',text)
     text=re.sub(r'(n\'(?=t))|(?<=\w)\'(?=([sdm]|ve|ll|re)?\s)|’',r' &apos;',text)
+    text=re.sub(r'(?<=\s)\'',r'&quot2; ',text)
     text=re.sub(r'((^|\s)[^\s.]+)\.(?=$|\s)',r'\1 .',text)
     text=re.sub(r'(?<=\d) , (?=\d)',r',',text)
     text=re.sub(r' +',r' ',text)
@@ -23,14 +26,15 @@ def zh_preprocess(text,segment=True):
         text=' '.join(jieba.cut(text))
     text=re.sub(r' +',r' ',text)
     text=re.sub(r'\n +',r'\n',text)
-    text=re.sub(r'[‘’“”]',r'&quot;',text)
+    text=re.sub(r'[“”]',r'&quot;',text)
+    text=re.sub(r'[‘’]',r'&quot2;',text)
 
     return text
 
-def text_process(text,lang,**kwargs):
+def text_process(text,lang,func_dict,**kwargs):
     dict = {'zh': zh_preprocess, 'en': en_preprocess}
-    dict.update(kwargs)
-    return dict[lang](text)
+    dict.update(func_dict)
+    return dict[lang](text,**kwargs[lang])
 
 def gen_corpus_for_mixed_text(path, out_dir, name, lang='all'):
     with open(path, 'r', encoding='utf8') as f:
@@ -58,6 +62,8 @@ def slide_corpus(text_list, shuffle_index,slide_ratios, out_dir, names):
         exit(1)
     l=len(text_list)
     slide_num=[0]+[int(l*sum[i]) for i in range(len(sum))]+[l]
+
+    #使用numpy.random.shuffle容易内存溢出，使用索引重建python列表可避免
     shuffle_list=[text_list[i] for i in shuffle_index]
     for i in range(len(slide_num)-1):
         with open(out_dir+'\\'+names[i], 'w', encoding='utf8') as f:
@@ -71,7 +77,7 @@ def vocab(text, out_dir,name, lang,vocab_size_list):
     text = text.replace('\n', ' ')
     b = text.split(' ')
     counter = Counter(b)
-    u = ['<unk>', '<s>', '</s>','&quot;','.',',']
+    u = ['<unk>', '<s>', '</s>','&quot;','&quot2;','&apos;','.',',']
     counter.pop('',None)
     for k in u:
         counter.pop(k,None)
