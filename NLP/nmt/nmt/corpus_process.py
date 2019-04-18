@@ -15,7 +15,7 @@ def en_preprocess(text):
     text=re.sub(r'((^|\s)[^\s.]+)\.(?=$|\s)',r'\1 .',text)
     text=re.sub(r'(?<=\d) , (?=\d)',r',',text)
     text=re.sub(r' +',r' ',text)
-    text = re.sub(r'\n ', r'\n', text)
+    text = re.sub(r' +\n +', r'\n', text)
 
     return text
 
